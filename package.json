@@ -1,0 +1,70 @@
+{
+  "name": "playground-readme-editor",
+  "displayName": "playground-readme-editor",
+  "description": "An extension to edit README files in WordPress Playground",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.93.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "wordpress-playground-readme-editor",
+          "title": "WordPress Playground README",
+          "icon": "public/sidebar-button.svg",
+          "command": "playground-readme-editor.open"
+        }
+      ]
+    },
+    "views": {
+      "wordpress-playground-readme-editor": [
+        {
+          "id": "wordpress-playground-readme-editor",
+          "name": "README",
+          "type": "webview"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "playground-readme-editor.open",
+        "title": "Open"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "when": "resourceLangId == markdown",
+          "command": "playground-readme-editor.open",
+          "alt": "markdown.showPreviewToSide",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.93.0",
+    "@types/mocha": "^10.0.7",
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^8.3.0",
+    "@typescript-eslint/parser": "^8.3.0",
+    "eslint": "^9.9.1",
+    "typescript": "^5.5.4",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1"
+  }
+}

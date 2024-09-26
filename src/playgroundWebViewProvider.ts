@@ -294,6 +294,14 @@ class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
     }
     }
     add_action('admin_init', 'disable_gutenberg_welcome_on_load');
+
+    // Changes to clean up the interface/.
+    function remove_title_support() {
+          remove_post_type_support( 'post', 'title' );
+          remove_post_type_support( 'post', 'thumbnail' );
+          wp_update_post( array( 'ID' => 1, 'post_content' => '' ) );
+    }
+    add_action( 'init', 'remove_title_support' );
     
     function enqueue_script() {
         wp_enqueue_script( 'playground-editor-script', plugin_dir_url( __FILE__ ) . 'script.js', array( 'jquery' ), '1.0', true );

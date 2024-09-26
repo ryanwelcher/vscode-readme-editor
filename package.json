@@ -16,7 +16,7 @@
       "activitybar": [
         {
           "id": "wordpress-playground-readme-editor",
-          "title": "Block Editor",
+          "title": "WordPress everywhere",
           "icon": "public/sidebar-button.svg"
         }
       ]
@@ -25,7 +25,7 @@
       "wordpress-playground-readme-editor": [
         {
           "id": "wordpress-playground-readme-editor",
-          "name": "",
+          "name": "Markdown Editor",
           "type": "webview"
         }
       ]

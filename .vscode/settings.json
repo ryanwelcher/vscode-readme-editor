@@ -1,7 +1,7 @@
 // Place your settings in this file to overwrite default and user settings.
 {
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "[javascript]": {
+  "[javascript][typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "files.exclude": {

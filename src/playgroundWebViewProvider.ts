@@ -1,9 +1,29 @@
 import * as vscode from "vscode";
-
+import * as path from "path";
+import * as fs from "fs";
 class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "wordpress-playground-readme-editor";
 
+  private _view?: vscode.WebviewView;
+  private _activeDoc?: vscode.TextDocument;
+
   constructor(private readonly _extensionUri: vscode.Uri) {}
+
+  public refreshPlayground(evt: vscode.TextDocument | undefined) {
+    if (evt) {
+      this._activeDoc = evt;
+      if (this._view) {
+        // Reuse the same PG instance and just replace the content.
+        this._view.webview.postMessage({
+          command: "setEditorContent",
+          format: "markdown",
+          text: this._activeDoc.getText(),
+        });
+      }
+      // Set the activeEditor to which ever one was opened/changed
+      vscode.window.showTextDocument(this._activeDoc);
+    }
+  }
 
   /**
    * Revolves a webview view.
@@ -14,14 +34,11 @@ class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
    * @return Optional thenable indicating that the view has been fully resolved.
    */
   public resolveWebviewView(webviewView: vscode.WebviewView) {
-    const editor = vscode.window.activeTextEditor;
-    const window = vscode.window;
+    this._view = webviewView;
 
-    let documentText = "";
-    if (editor) {
-      documentText = editor.document.getText();
-      console.log("editor details", window);
-    }
+    const editor = vscode.window.activeTextEditor;
+
+    const documentText = editor?.document?.getText() || "";
 
     webviewView.webview.options = {
       // Allow scripts in the webview
@@ -29,12 +46,13 @@ class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
       localResourceRoots: [this._extensionUri],
     };
 
-    webviewView.webview.html = this._getHtmlForWebview(
-      webviewView.webview,
-      documentText
-    );
+    webviewView.webview.html = this._getHtmlForWebview(documentText);
 
     webviewView.webview.onDidReceiveMessage(async (message) => {
+      // Retrieve the active editor every time as it may have changed.
+
+      // console.log(message);
+      const editor = vscode.window.activeTextEditor;
       if (editor) {
         // documentText = editor.document.getText();
         editor.edit((selectedText) => {
@@ -50,30 +68,48 @@ class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
     });
   }
 
-  private _getHtmlForWebview(webview: vscode.Webview, initialContent: string) {
-    return `
-	<script>
-	const vscode = acquireVsCodeApi();
-		window.addEventListener(
-  			"message",
-  			(event) => {
-				console.log( 'message', event );
-				vscode.postMessage(event.data)
-			},
-		);
-	</script>
-	<iframe width="100%" height="1000px" src="https://playground.wordpress.net/?mode=seamless#${encodeURI(
-    JSON.stringify(this.makePlaygroundBlueprint(initialContent))
-  )}"></iframe>`;
+  /**
+   * Retrieves the markup content.
+   * @returns string
+   */
+  private _getHTMLFile(): string {
+    const filePath: vscode.Uri = vscode.Uri.file(
+      path.join(this._extensionUri.path, "src", "webview.html")
+    );
+    return fs.readFileSync(filePath.fsPath, "utf8");
   }
 
+  /**
+   * Generate the webview content.
+   * @param string content
+   * @returns
+   */
+  private _getHtmlForWebview(content: string): string {
+    const contents = this._getHTMLFile();
+
+    // replace the content;
+    return contents
+      .replaceAll("${content}", content)
+      .replaceAll(
+        "${playgroundOptions}",
+        encodeURI(JSON.stringify(this.makePlaygroundBlueprint(content)))
+      );
+  }
+
+  /**
+   * Build the playground configuration.
+   *
+   * @param string initialValue The content to be displayed
+   * @param string initialFormat The format returned by the blocks.
+   * @returns object
+   */
   public makePlaygroundBlueprint(
     initialValue: string,
     initialFormat: string = "markdown"
   ) {
     return {
       login: true,
-      landingPage: "/wp-admin/post-new.php?post_type=post",
+      landingPage: "/wp-admin/post.php?post=1&action=edit",
       preferredVersions: {
         wp: "nightly",
         php: "8.0",
@@ -151,6 +187,16 @@ class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
                         type: 'relay'
                     }, '*');
                 }
+
+                function pushSaveEvent() {
+                  window.parent.postMessage(
+                    {
+                      command: 'saveOccurred',
+                      type: 'relay'
+                    },
+                    '*'
+                  );
+                }
     
                 // Accept commands from the parent window
                 window.addEventListener('message', (event) => {
@@ -188,7 +234,13 @@ class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
                         const debouncedPushEditorContents = debounce(pushEditorContentsToParent, 600);
                         let previousBlocks = undefined;
                         let subscribeInitialized = false;
+                        let isSaving = false;
                         wp.data.subscribe(() => {
+                            // if ( isSaving !== wp.data.select('core/editor').isSavingPost() ) {
+                            //    pushSaveEvent();
+                            //    return;
+                            // }
+
                              if(previousBlocks === undefined) {
                                  previousBlocks = wp.data.select('core/block-editor').getBlocks();
                                  return;

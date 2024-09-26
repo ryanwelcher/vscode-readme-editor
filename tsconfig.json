@@ -4,8 +4,10 @@
 		"target": "ES2022",
 		"outDir": "out",
 		"lib": [
-			"ES2022"
+			"ES2022",
+			"DOM"
 		],
+		"jsx": "preserve",
 		"sourceMap": true,
 		"rootDir": "src",
 		"strict": true   /* enable all strict type-checking options */

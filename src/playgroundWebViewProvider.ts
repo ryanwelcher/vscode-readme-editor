@@ -6,18 +6,23 @@ class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
 
   private _view?: vscode.WebviewView;
   private _activeDoc?: vscode.TextDocument;
+  private _canEdit: boolean = false;
 
   constructor(private readonly _extensionUri: vscode.Uri) {}
+
+  private _allowedLangs = ["markdown"];
 
   public refreshPlayground(evt: vscode.TextDocument | undefined) {
     if (evt) {
       this._activeDoc = evt;
+      this._canEdit = this._allowedLangs.includes(this._activeDoc.languageId);
       if (this._view) {
-        // Reuse the same PG instance and just replace the content.
         this._view.webview.postMessage({
           command: "setEditorContent",
           format: "markdown",
-          text: this._activeDoc.getText(),
+          text: this._canEdit
+            ? this._activeDoc.getText()
+            : `## ${this._activeDoc.languageId} is not supported`,
         });
       }
       // Set the activeEditor to which ever one was opened/changed
@@ -38,7 +43,14 @@ class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
 
     const editor = vscode.window.activeTextEditor;
 
-    const documentText = editor?.document?.getText() || "";
+    if (editor) {
+      this._activeDoc = editor.document;
+      this._canEdit = this._allowedLangs.includes(this._activeDoc.languageId);
+    }
+
+    const documentText = this._canEdit
+      ? this?._activeDoc?.getText()
+      : `## ${this?._activeDoc?.languageId} is not supported`;
 
     webviewView.webview.options = {
       // Allow scripts in the webview
@@ -46,14 +58,14 @@ class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
       localResourceRoots: [this._extensionUri],
     };
 
-    webviewView.webview.html = this._getHtmlForWebview(documentText);
+    webviewView.webview.html = this._getHtmlForWebview(documentText || "");
 
     webviewView.webview.onDidReceiveMessage(async (message) => {
       // Retrieve the active editor every time as it may have changed.
 
       // console.log(message);
       const editor = vscode.window.activeTextEditor;
-      if (editor) {
+      if (editor && this._canEdit) {
         // documentText = editor.document.getText();
         editor.edit((selectedText) => {
           selectedText.replace(

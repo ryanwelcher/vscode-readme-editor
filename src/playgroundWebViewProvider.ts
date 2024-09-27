@@ -22,7 +22,7 @@ class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
           format: "markdown",
           text: this._canEdit
             ? this._activeDoc.getText()
-            : `## ${this._activeDoc.languageId} is not supported`,
+            : `## ${this._activeDoc.languageId} files are not supported`,
         });
       }
       // Set the activeEditor to which ever one was opened/changed
@@ -50,7 +50,7 @@ class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
 
     const documentText = this._canEdit
       ? this?._activeDoc?.getText()
-      : `## ${this?._activeDoc?.languageId} is not supported`;
+      : `## ${this?._activeDoc?.languageId} files are not supported`;
 
     webviewView.webview.options = {
       // Allow scripts in the webview

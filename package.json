@@ -2,7 +2,18 @@
   "name": "playground-readme-editor",
   "displayName": "playground-readme-editor",
   "description": "An extension to edit README files in WordPress Playground",
-  "version": "0.0.1",
+  "publisher": "ryanwelcher",
+  "author": {
+    "name": "Ryan Welcher",
+    "email": "me@ryanwelcher.com",
+    "url": "https://www.ryanwelcher.com"
+  },
+  "license": "GPLv2 or later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ryanwelcher/vscode-readme-editor.git"
+  },
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.93.0"
   },
@@ -37,7 +48,11 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "prepackage": "rimraf *.vsix",
+    "package": "vsce package",
+    "load": "code --install-extension *.vsix",
+    "refresh-extension": "npm run package && npm run load"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.7",
@@ -48,7 +63,8 @@
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
     "eslint": "^9.9.1",
-    "typescript": "^5.5.4"
-  },
-  "dependencies": {}
+    "rimraf": "^6.0.1",
+    "typescript": "^5.5.4",
+    "vsce": "^2.15.0"
+  }
 }

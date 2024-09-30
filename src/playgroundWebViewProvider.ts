@@ -1,6 +1,9 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
+
+// @ts-ignore
+import markup from "./webview.html!text";
 class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "wordpress-playground-readme-editor";
 
@@ -21,7 +24,7 @@ class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
           command: "setEditorContent",
           format: "markdown",
           text: this._canEdit
-            ? this._activeDoc.getText()
+            ? this._activeDoc.getText().trim()
             : `## ${this._activeDoc.languageId} files are not supported`,
         });
       }
@@ -48,9 +51,12 @@ class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
       this._canEdit = this._allowedLangs.includes(this._activeDoc.languageId);
     }
 
-    const documentText = this._canEdit
-      ? this?._activeDoc?.getText()
-      : `## ${this?._activeDoc?.languageId} files are not supported`;
+    let documentText = "## Please open a file";
+    if (this?._activeDoc?.languageId) {
+      documentText = this._canEdit
+        ? this?._activeDoc?.getText().trim() || ""
+        : `## ${this?._activeDoc?.languageId} files are not supported`;
+    }
 
     webviewView.webview.options = {
       // Allow scripts in the webview
@@ -66,7 +72,7 @@ class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
       // console.log(message);
       const editor = vscode.window.activeTextEditor;
       if (editor && this._canEdit) {
-        // documentText = editor.document.getText();
+        // Update the text
         editor.edit((selectedText) => {
           selectedText.replace(
             new vscode.Range(
@@ -86,7 +92,7 @@ class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
    */
   private _getHTMLFile(): string {
     const filePath: vscode.Uri = vscode.Uri.file(
-      path.join(this._extensionUri.path, "src", "webview.html")
+      path.join(this._extensionUri.path, "out", "webview.html")
     );
     return fs.readFileSync(filePath.fsPath, "utf8");
   }

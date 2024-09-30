@@ -24,7 +24,7 @@ export function activate(context: vscode.ExtensionContext) {
   // Refresh Playground when a new file is opened.
   context.subscriptions.push(
     vscode.workspace.onDidOpenTextDocument((e: vscode.TextDocument) => {
-      provider.refreshPlayground(e);
+      // provider.refreshPlayground(e);
     })
   );
 

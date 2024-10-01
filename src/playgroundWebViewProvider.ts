@@ -15,16 +15,29 @@ class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
 
   private _allowedLangs = ["markdown"];
 
+  public resetBlockEditorText() {
+    if (this._view) {
+      this._view.webview.postMessage({
+        command: "setEditorContent",
+        format: "markdown",
+        text: "## Please open a file",
+      });
+    }
+  }
+
   public refreshPlayground(evt: vscode.TextDocument | undefined) {
     if (evt) {
       this._activeDoc = evt;
       this._canEdit = this._allowedLangs.includes(this._activeDoc.languageId);
+      const docText = this._activeDoc.getText().trim();
       if (this._view) {
         this._view.webview.postMessage({
           command: "setEditorContent",
           format: "markdown",
           text: this._canEdit
-            ? this._activeDoc.getText().trim()
+            ? docText.length > 0
+              ? docText
+              : "## Insert blocks to get started"
             : `## ${this._activeDoc.languageId} files are not supported`,
         });
       }
@@ -53,8 +66,9 @@ class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
 
     let documentText = "## Please open a file";
     if (this?._activeDoc?.languageId) {
+      const text = this?._activeDoc?.getText().trim();
       documentText = this._canEdit
-        ? this?._activeDoc?.getText().trim() || ""
+        ? text || "## Insert blocks to get started"
         : `## ${this?._activeDoc?.languageId} files are not supported`;
     }
 
@@ -72,16 +86,21 @@ class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
       // console.log(message);
       const editor = vscode.window.activeTextEditor;
       if (editor && this._canEdit) {
-        // Update the text
-        editor.edit((selectedText) => {
-          selectedText.replace(
-            new vscode.Range(
-              editor.document.lineAt(0).range.start,
-              editor.document.lineAt(editor.document.lineCount - 1).range.end
-            ),
-            message.text
-          );
-        });
+        if (
+          message.text !== "## Please open a file" &&
+          message.text !== "## Insert blocks to get started"
+        ) {
+          // Update the text
+          editor.edit((selectedText) => {
+            selectedText.replace(
+              new vscode.Range(
+                editor.document.lineAt(0).range.start,
+                editor.document.lineAt(editor.document.lineCount - 1).range.end
+              ),
+              message.text
+            );
+          });
+        }
       }
     });
   }

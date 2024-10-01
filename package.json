@@ -1,6 +1,6 @@
 {
   "name": "playground-readme-editor",
-  "displayName": "playground-readme-editor",
+  "displayName": "WordPress Playground markdown editor",
   "description": "An extension to edit README files in WordPress Playground",
   "publisher": "ryanwelcher",
   "author": {
@@ -13,7 +13,7 @@
     "type": "git",
     "url": "https://github.com/ryanwelcher/vscode-readme-editor.git"
   },
-  "version": "0.0.3",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.93.0"
   },
@@ -27,7 +27,7 @@
       "activitybar": [
         {
           "id": "wordpress-playground-readme-editor",
-          "title": "WordPress everywhere",
+          "title": "WordPress Playground",
           "icon": "public/sidebar-button.svg"
         }
       ]

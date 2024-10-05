@@ -23,11 +23,27 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
+    "menus": {
+      "editor/title": [
+        {
+          "when": "resourceLangId == markdown",
+          "command": "playground-readme-editor.open",
+          "alt": "markdown.showPreviewToSide",
+          "group": "navigation"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "playground-readme-editor.open",
+        "title": "Open editor"
+      }
+    ],
     "viewsContainers": {
       "activitybar": [
         {
           "id": "wordpress-playground-readme-editor",
-          "title": "WordPress Playground",
+          "title": "WordPress Everywhere",
           "icon": "public/sidebar-button.svg"
         }
       ]

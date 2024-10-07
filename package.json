@@ -3,6 +3,7 @@
   "displayName": "WordPress Playground markdown editor",
   "description": "An extension to edit README files in WordPress Playground",
   "publisher": "ryanwelcher",
+  "icon": "public/icon.png",
   "author": {
     "name": "Ryan Welcher",
     "email": "me@ryanwelcher.com",
@@ -23,11 +24,27 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
+    "menus": {
+      "editor/title": [
+        {
+          "when": "resourceLangId == markdown",
+          "command": "playground-readme-editor.open",
+          "alt": "markdown.showPreviewToSide",
+          "group": "navigation"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "playground-readme-editor.open",
+        "title": "Open block editor"
+      }
+    ],
     "viewsContainers": {
       "activitybar": [
         {
           "id": "wordpress-playground-readme-editor",
-          "title": "WordPress Playground",
+          "title": "WordPress Everywhere",
           "icon": "public/sidebar-button.svg"
         }
       ]

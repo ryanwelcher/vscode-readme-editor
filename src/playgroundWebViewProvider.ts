@@ -42,7 +42,9 @@ class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
         });
       }
       // Set the activeEditor to which ever one was opened/changed
-      vscode.window.showTextDocument(this._activeDoc);
+      if (this._canEdit) {
+        vscode.window.showTextDocument(this._activeDoc);
+      }
     }
   }
 
@@ -148,7 +150,7 @@ class PlaygroundWebViewProvider implements vscode.WebviewViewProvider {
       login: true,
       landingPage: "/wp-admin/post.php?post=1&action=edit",
       preferredVersions: {
-        wp: "nightly",
+        wp: "6.6",
         php: "8.0",
       },
       steps: [

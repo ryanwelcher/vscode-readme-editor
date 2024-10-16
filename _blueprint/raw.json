@@ -1,0 +1,47 @@
+{
+  "login": true,
+  "landingPage": "/wp-admin/post.php?post=1&action=edit",
+  "preferredVersions": {
+    "wp": "6.6",
+    "php": "8.0"
+  },
+  "steps": [
+    {
+      "step": "mkdir",
+      "path": "/wordpress/wp-content/plugins/playground-editor"
+    },
+    {
+      "step": "installPlugin",
+      "pluginZipFile": {
+        "resource": "url",
+        "url": "https://github-proxy.com/proxy/?repo=dmsnell/blocky-formats"
+      },
+      "options": {
+        "activate": false
+      }
+    },
+    {
+      "step": "mv",
+      "fromPath": "/wordpress/wp-content/plugins/blocky-formats-trunk",
+      "toPath": "/wordpress/wp-content/plugins/blocky-formats"
+    },
+    {
+      "step": "activatePlugin",
+      "pluginPath": "blocky-formats/blocky-formats.php"
+    },
+    {
+      "step": "writeFile",
+      "path": "/wordpress/wp-content/plugins/playground-editor/script.js",
+      "data": "\n\nfunction waitForDOMContentLoaded() {\n    return new Promise((resolve) => {\n        if (\n            document.readyState === 'complete' ||\n            document.readyState === 'interactive'\n        ) {\n            resolve();\n        } else {\n            document.addEventListener('DOMContentLoaded', resolve);\n        }\n    });\n}\n\nawait import('../blocky-formats/vendor/commonmark.min.js');\nconst { markdownToBlocks, blocks2markdown } = await import('../blocky-formats/src/markdown.js');\nconst formatConverters = {\n    markdown: {\n        toBlocks: markdownToBlocks,\n        fromBlocks: blocks2markdown\n    }\n};\n\nfunction populateEditorWithFormattedText(text, format) {\n    if(!(format in formatConverters)) {\n        throw new Error('Unsupported format');\n    }\n\n    const createBlocks = blocks => blocks.map(block => wp.blocks.createBlock(block.name, block.attributes, createBlocks(block.innerBlocks)));\n    const rawBlocks = formatConverters[format].toBlocks(text);\n\n    window.wp.data\n        .dispatch('core/block-editor')\n        .resetBlocks(createBlocks(rawBlocks));\n}\n\nfunction pushEditorContentsToParent(format) {\n    const blocks = wp.data.select('core/block-editor').getBlocks();\n    window.parent.postMessage({\n        command: 'playgroundEditorTextChanged',\n        format: format,\n        text: formatConverters[format].fromBlocks(blocks),\n        type: 'relay'\n    }, '*');\n}\n\nfunction pushSaveEvent() {\n    window.parent.postMessage(\n        {\n            command: 'saveOccurred',\n            type: 'relay'\n        },\n        '*'\n    );\n}\n\n// Accept commands from the parent window\nwindow.addEventListener('message', (event) => {\n    if(typeof event.data !== 'object') {\n        return;\n    }\n    \n    const { command, format, text } = event.data;\n    lastKnownFormat = format;\n\n    if(command === 'setEditorContent') {\n        populateEditorWithFormattedText(text, format);\n    } else if(command === 'getEditorContent') {\n        const blocks = wp.data.select('core/block-editor').getBlocks();\n        window.parent.postMessage({\n            command: 'playgroundEditorTextChanged',\n            format: format,\n            text: formatConverters[format].fromBlocks(blocks),\n            type: 'relay'\n        }, '*');\n    }\n});\n\n// Populate the editor with the initial value\nlet lastKnownFormat = \"${initialFormat}\";\nwaitForDOMContentLoaded().then(() => {\n    // @TODO: Don't do timeout.\n    //        Instead, populate the editor immediately after it's ready.\n    setTimeout(() => {\n        populateEditorWithFormattedText(\n            \"${initialValue}\",\n            lastKnownFormat\n        );\n\n        const debouncedPushEditorContents = debounce(pushEditorContentsToParent, 600);\n        let previousBlocks = undefined;\n        let subscribeInitialized = false;\n        let isSaving = false;\n        wp.data.subscribe(() => {\n            // if ( isSaving !== wp.data.select('core/editor').isSavingPost() ) {\n            //    pushSaveEvent();\n            //    return;\n            // }\n\n            if(previousBlocks === undefined) {\n                previousBlocks = wp.data.select('core/block-editor').getBlocks();\n                return;\n            }\n            const currentBlocks = wp.data.select('core/block-editor').getBlocks();\n            if (previousBlocks !== currentBlocks) {\n                debouncedPushEditorContents(lastKnownFormat);\n                previousBlocks = currentBlocks;\n            }\n        });\n    }, 500);\n\n    // Experiment with sending the updated value back to the parent window\n    // when typing. Debounce by 600ms.\n    function debounce(func, wait) {\n        let timeout;\n        return function(...args) {\n            const context = this;\n            clearTimeout(timeout);\n            timeout = setTimeout(() => func.apply(context, args), wait);\n        };\n    }\n});\n"
+    },
+    {
+      "step": "writeFile",
+      "path": "/wordpress/wp-content/plugins/playground-editor/index.php",
+      "data": "<?php\n/**\n* Plugin Name: Playground Editor\n* Description: A simple plugin to edit rich text formats in Gutenberg.\n*/\n// Disable welcome panel every time a user accesses the editor\nfunction disable_gutenberg_welcome_on_load() {\n    if (is_admin()) {\n        update_user_meta(get_current_user_id(), 'show_welcome_panel', 0);\n        remove_action('enqueue_block_editor_assets', 'wp_enqueue_editor_tips');\n    }\n}\nadd_action('admin_init', 'disable_gutenberg_welcome_on_load');\n\n// Changes to clean up the interface.\nfunction remove_title_support() {\n    remove_post_type_support( 'post', 'title' );\n    remove_post_type_support( 'post', 'thumbnail' );\n    wp_update_post( array( 'ID' => 1, 'post_content' => '' ) );\n}\nadd_action( 'init', 'remove_title_support' );\n\nfunction enqueue_script() {\n    wp_enqueue_script( 'playground-editor-script', plugin_dir_url( __FILE__ ) . 'script.js', array( 'jquery' ), '1.0', true );\n}\nadd_action( 'admin_init', 'enqueue_script' );\n\n// Set script attribute to module\nadd_filter('script_loader_tag', function($tag, $handle, $src) {\n    if ($handle === 'playground-editor-script') {\n        $tag = '<script type=\"module\" src=\"' . esc_url($src) . '\">'.'<'.'/script>';\n    }\n    return $tag;\n}, 10, 3);\n"
+    },
+    {
+      "step": "activatePlugin",
+      "pluginPath": "playground-editor/index.php"
+    }
+  ]
+}

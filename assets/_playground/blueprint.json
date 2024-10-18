@@ -1,0 +1,47 @@
+{
+  "login": true,
+  "landingPage": "/wp-admin/post.php?post=1&action=edit",
+  "preferredVersions": {
+    "wp": "nightly",
+    "php": "8.0"
+  },
+  "steps": [
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "url",
+        "url": "https://github-proxy.com/proxy/?repo=dmsnell/blocky-formats"
+      },
+      "options": {
+        "activate": false
+      }
+    },
+    {
+      "step": "mv",
+      "fromPath": "/wordpress/wp-content/plugins/blocky-formats-trunk",
+      "toPath": "/wordpress/wp-content/plugins/blocky-formats"
+    },
+    {
+      "step": "activatePlugin",
+      "pluginPath": "blocky-formats/blocky-formats.php"
+    },
+    {
+      "step": "mkdir",
+      "path": "/wordpress/wp-content/plugins/playground-editor"
+    },
+    {
+      "step": "writeFile",
+      "path": "/wordpress/wp-content/plugins/playground-editor/script.js",
+      "data": "<%SCRIPT_JS%>"
+    },
+    {
+      "step": "writeFile",
+      "path": "/wordpress/wp-content//plugins/playground-editor/index.php",
+      "data": "<%PLUGIN_INDEX_PHP%>"
+    },
+    {
+      "step": "activatePlugin",
+      "pluginPath": "playground-editor/index.php"
+    }
+  ]
+}

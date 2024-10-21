@@ -42,7 +42,9 @@ export default class PlaygroundWebViewProvider
         });
       }
       // Set the activeEditor to which ever one was opened/changed
-      vscode.window.showTextDocument(this._activeDoc);
+      if (this._canEdit) {
+        vscode.window.showTextDocument(this._activeDoc);
+      }
     }
   }
 

@@ -9,6 +9,15 @@ export function activate(context: vscode.ExtensionContext) {
   const provider = new PlaygroundWebViewProvider(context.extensionUri);
   // Object to store saved versions of files.
 
+  // Add a button to show the markdown editor
+  context.subscriptions.push(
+    vscode.commands.registerCommand("playground-readme-editor.open", () => {
+      vscode.commands.executeCommand(
+        "workbench.view.extension.wordpress-playground-readme-editor"
+      );
+    })
+  );
+
   // Create the webview provider.
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(

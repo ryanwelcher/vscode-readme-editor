@@ -11,9 +11,9 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Add a button to show the markdown editor
   context.subscriptions.push(
-    vscode.commands.registerCommand("playground-readme-editor.open", () => {
+    vscode.commands.registerCommand('playground-readme-editor.open', () => {
       vscode.commands.executeCommand(
-        "workbench.view.extension.wordpress-playground-readme-editor"
+        'workbench.view.extension.wordpress-playground-readme-editor'
       );
     })
   );
@@ -40,11 +40,15 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
 
-  vscode.window.onDidChangeActiveTextEditor((editor) => {
-    if (editor) {
-      provider.refreshPlayground(editor.document);
-    }
-  });
+  context.subscriptions.push(
+    vscode.window.onDidChangeActiveTextEditor(
+      (e: vscode.TextEditor | undefined) => {
+        if (e) {
+          provider.refreshPlayground(e?.document);
+        }
+      }
+    )
+  );
 }
 
 // This method is called when your extension is deactivated

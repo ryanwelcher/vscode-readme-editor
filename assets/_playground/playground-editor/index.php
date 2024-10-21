@@ -31,11 +31,11 @@ function enqueue_script()
 add_action('admin_init', 'enqueue_script');
 
 // Set script attribute to module
-/*
 add_filter('script_loader_tag', function ($tag, $handle, $src) {
     if ($handle === 'playground-editor-script') {
-        $tag = '<script type=\"module\" src=\"' . esc_url($src) . '\">' . '<' . '/script>';
+        $tag = '<script type="module" src="' . esc_url($src) . '">' . '<' . '/script>';
+        error_log("script_loader_tag");
+        error_log(print_r($tag, TRUE));
     }
     return $tag;
 }, 10, 3);
-*/

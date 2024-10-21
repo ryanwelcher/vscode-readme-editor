@@ -2,9 +2,6 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 
-// @ts-ignore
-//import markup from "../assets/webview.html!text";
-
 export default class PlaygroundWebViewProvider
   implements vscode.WebviewViewProvider
 {
@@ -86,7 +83,6 @@ export default class PlaygroundWebViewProvider
     webviewView.webview.onDidReceiveMessage(async (message) => {
       // Retrieve the active editor every time as it may have changed.
 
-      // console.log(message);
       const editor = vscode.window.activeTextEditor;
       if (editor && this._canEdit) {
         if (
@@ -126,7 +122,7 @@ export default class PlaygroundWebViewProvider
    */
   private _getHtmlForWebview(content: string): string {
     const contents = this._getLocalFile('webview.html')
-      .replaceAll('${content}', content)
+      // .replaceAll('${content}', content)
       .replaceAll(
         '${playgroundOptions}',
         encodeURI(JSON.stringify(this.makePlaygroundBlueprint(content)))
@@ -166,8 +162,7 @@ export default class PlaygroundWebViewProvider
     const parsedInitialValue = initialValue
       .replaceAll('"', "\\'")
       .replaceAll('\n', '\\n ');
-    const scriptWithVariables = `(async function (initialFormat, initialValue) { ${scriptPluginContent} })(initialFormat = '${initialFormat}', initialValue = "${parsedInitialValue}")`;
-
+    const scriptWithVariables = `const initialFormat = '${initialFormat}'; const initialValue = "${parsedInitialValue}"; ${scriptPluginContent}`;
     const blueprint = JSON.parse(this._getBlueprint());
     blueprint.steps[4].data = scriptWithVariables;
     blueprint.steps[5].data = `${pluginIndexPhpContents}`;

@@ -1,26 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>WordPress Playground</title>
-	</head>
-    <script>
-        const vscode = acquireVsCodeApi();
-       
-        window.addEventListener(
-            "message",
-            (event) => {
-                const iframe = document.getElementById('pg');
-                if ( event.data.command === 'playgroundEditorTextChanged' ) {
-                    vscode.postMessage(event.data);
-                } else {
-                     iframe.contentWindow.postMessage({command:'setEditorContent', format:'markdown', text:event.data.text, type: 'relay'}, '*');
-                }
-            },
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WordPress Playground</title>
+  </head>
+  <script>
+    const vscode = acquireVsCodeApi();
+
+    window.addEventListener('message', (event) => {
+      const iframe = document.getElementById('pg');
+      if (event.data.command === 'playgroundEditorTextChanged') {
+        vscode.postMessage(event.data);
+      } else {
+        iframe.contentWindow.postMessage(
+          {
+            command: 'setEditorContent',
+            format: 'markdown',
+            text: event.data.text,
+            type: 'relay',
+          },
+          '*'
         );
-    </script>
-    <body>
-        <iframe id="pg" style="border:none;" width="100%" height="1000px" src="https://playground.wordpress.net/?mode=seamless#${playgroundOptions}"></iframe>
-    </body>
+      }
+    });
+  </script>
+  <body>
+    <iframe
+      id="pg"
+      style="border: none"
+      width="100%"
+      height="1000px"
+      src="https://playground.wordpress.net/?mode=seamless#${playgroundOptions}"
+    ></iframe>
+  </body>
 </html>

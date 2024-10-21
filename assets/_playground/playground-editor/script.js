@@ -23,7 +23,6 @@ const formatConverters = {
 };
 
 function populateEditorWithFormattedText(text, format) {
-  debugger;
   if (!(format in formatConverters)) {
     throw new Error('Unsupported format');
   }
@@ -56,16 +55,6 @@ function pushEditorContentsToParent(format) {
   );
 }
 
-function pushSaveEvent() {
-  window.parent.postMessage(
-    {
-      command: 'saveOccurred',
-      type: 'relay',
-    },
-    '*'
-  );
-}
-
 // Accept commands from the parent window
 window.addEventListener('message', (event) => {
   if (typeof event.data !== 'object') {
@@ -77,17 +66,6 @@ window.addEventListener('message', (event) => {
 
   if (command === 'setEditorContent') {
     populateEditorWithFormattedText(text, format);
-  } else if (command === 'getEditorContent') {
-    const blocks = wp.data.select('core/block-editor').getBlocks();
-    window.parent.postMessage(
-      {
-        command: 'playgroundEditorTextChanged',
-        format: format,
-        text: formatConverters[format].fromBlocks(blocks),
-        type: 'relay',
-      },
-      '*'
-    );
   }
 });
 
@@ -97,7 +75,6 @@ waitForDOMContentLoaded().then(() => {
   // @TODO: Don't do timeout.
   //        Instead, populate the editor immediately after it's ready.
   setTimeout(() => {
-    console.log('initialValue', initialValue);
     populateEditorWithFormattedText(initialValue, lastKnownFormat);
 
     const debouncedPushEditorContents = debounce(
@@ -108,11 +85,6 @@ waitForDOMContentLoaded().then(() => {
     let subscribeInitialized = false;
     let isSaving = false;
     wp.data.subscribe(() => {
-      // if ( isSaving !== wp.data.select('core/editor').isSavingPost() ) {
-      //    pushSaveEvent();
-      //    return;
-      // }
-
       if (previousBlocks === undefined) {
         previousBlocks = wp.data.select('core/block-editor').getBlocks();
         return;

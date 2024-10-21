@@ -32,12 +32,12 @@
     {
       "step": "writeFile",
       "path": "/wordpress/wp-content/plugins/playground-editor/script.js",
-      "data": "<%SCRIPT_JS%>"
+      "data": "<%TO_BE_FILLED_AT_playgroundWebViewProvider_makePlaygroundBlueprint%>"
     },
     {
       "step": "writeFile",
       "path": "/wordpress/wp-content//plugins/playground-editor/index.php",
-      "data": "<%PLUGIN_INDEX_PHP%>"
+      "data": "<%TO_BE_FILLED_AT_playgroundWebViewProvider_makePlaygroundBlueprint%>"
     },
     {
       "step": "activatePlugin",

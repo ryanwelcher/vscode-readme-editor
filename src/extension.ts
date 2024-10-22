@@ -1,18 +1,19 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import * as vscode from "vscode";
-import PlaygroundWebViewProvider from "./playgroundWebViewProvider";
+import * as vscode from 'vscode';
+import PlaygroundWebViewProvider from './playgroundWebViewProvider';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
   const provider = new PlaygroundWebViewProvider(context.extensionUri);
+  // Object to store saved versions of files.
 
   // Add a button to show the markdown editor
   context.subscriptions.push(
-    vscode.commands.registerCommand("playground-readme-editor.open", () => {
+    vscode.commands.registerCommand('playground-readme-editor.open', () => {
       vscode.commands.executeCommand(
-        "workbench.view.extension.wordpress-playground-readme-editor"
+        'workbench.view.extension.wordpress-playground-readme-editor'
       );
     })
   );
@@ -39,7 +40,6 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
 
-  // When the active editor changes, we can do things.
   context.subscriptions.push(
     vscode.window.onDidChangeActiveTextEditor(
       (e: vscode.TextEditor | undefined) => {

@@ -49,6 +49,14 @@ export function activate(context: vscode.ExtensionContext) {
       }
     )
   );
+
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeTextDocument(
+      (e: vscode.TextDocumentChangeEvent) => {
+        provider.refreshPlayground(e?.document);
+      }
+    )
+  );
 }
 
 // This method is called when your extension is deactivated

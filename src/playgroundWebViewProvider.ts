@@ -10,6 +10,7 @@ export default class PlaygroundWebViewProvider
   private _view?: vscode.WebviewView;
   private _activeDoc?: vscode.TextDocument;
   private _canEdit: boolean = false;
+  private _currentText: string = '';
 
   constructor(private readonly _extensionUri: vscode.Uri) {}
 
@@ -30,7 +31,8 @@ export default class PlaygroundWebViewProvider
       this._activeDoc = evt;
       this._canEdit = this._allowedLangs.includes(this._activeDoc.languageId);
       const docText = this._activeDoc.getText().trim();
-      if (this._view) {
+
+      if (this._view && this._currentText !== docText) {
         this._view.webview.postMessage({
           command: 'setEditorContent',
           format: 'markdown',
@@ -40,6 +42,7 @@ export default class PlaygroundWebViewProvider
               : '## Insert blocks to get started'
             : `## ${this._activeDoc.languageId} files are not supported`,
         });
+        this._currentText = docText;
       }
       // Set the activeEditor to which ever one was opened/changed
       if (this._canEdit) {

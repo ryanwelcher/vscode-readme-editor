@@ -79,7 +79,7 @@ waitForDOMContentLoaded().then(() => {
 
     const debouncedPushEditorContents = debounce(
       pushEditorContentsToParent,
-      600
+      1000
     );
     let previousBlocks = undefined;
     let subscribeInitialized = false;

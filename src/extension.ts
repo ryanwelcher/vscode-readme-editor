@@ -98,9 +98,9 @@ export function activate(context: vscode.ExtensionContext) {
         const php = await handler.getPrimaryPhp();
 
         // Login to the admin page.
-        await login(php, {
-          username: 'admin',
-        });
+        // await login(php, {
+        //   username: 'admin',
+        // });
 
         const contents = provider
           .getLocalFile('webview.html')

@@ -5,33 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WordPress Playground</title>
   </head>
-  <script>
-    const vscode = acquireVsCodeApi();
+  <script type="module">
+    // import { startPlaygroundWeb } from 'https://playground.wordpress.net/client/index.js';
 
-    window.addEventListener('message', (event) => {
-      const iframe = document.getElementById('pg');
-      if (event.data.command === 'playgroundEditorTextChanged') {
-        vscode.postMessage(event.data);
-      } else {
-        iframe.contentWindow.postMessage(
-          {
-            command: 'setEditorContent',
-            format: 'markdown',
-            text: event.data.text,
-            type: 'relay',
-          },
-          '*'
-        );
-      }
-    });
+    // const client = await startPlaygroundWeb({
+    //   iframe: document.getElementById('pg'),
+    //   remoteUrl: `https://playground.wordpress.net/remote.html`,
+    //   blueprint: {
+    //     preferredVersions: {
+    //       wp: '6.3',
+    //       php: '8.0',
+    //     },
+    //     steps: [{ step: 'login' }],
+    //   },
+    // });
+    // await client.isReady();
+
+    // const vscode = acquireVsCodeApi();
+
+    // window.addEventListener('message', (event) => {
+    //   const iframe = document.getElementById('pg');
+    //   if (event.data.command === 'playgroundEditorTextChanged') {
+    //     vscode.postMessage(event.data);
+    //   } else {
+    //     iframe.contentWindow.postMessage(
+    //       {
+    //         command: 'setEditorContent',
+    //         format: 'markdown',
+    //         text: event.data.text,
+    //         type: 'relay',
+    //       },
+    //       '*'
+    //     );
+    //   }
+    // });
   </script>
   <body>
+    <div
+      id="loading-overlay"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+      "
+    >
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <div
+          class="spinner"
+          style="
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #0078d4;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+          "
+        ></div>
+        <div style="margin-top: 16px; font-size: 1.1em; color: #333">
+          Loading Playground...
+        </div>
+      </div>
+    </div>
     <iframe
       id="pg"
       style="border: none"
       width="100%"
       height="1000px"
-      src="https://playground.wordpress.net/?mode=seamless#${playgroundOptions}"
+      src="{$playgroundURL}"
     ></iframe>
+    <style>
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+    <script>
+      const iframe = document.getElementById('pg');
+      const overlay = document.getElementById('loading-overlay');
+      iframe.addEventListener('load', () => {
+        overlay.style.display = 'none';
+      });
+    </script>
   </body>
 </html>

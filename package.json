@@ -16,7 +16,7 @@
   },
   "version": "1.2.0",
   "engines": {
-    "vscode": "^1.93.0"
+    "vscode": "^1.96.2"
   },
   "categories": [
     "Other"
@@ -28,16 +28,15 @@
       "editor/title": [
         {
           "when": "resourceLangId == markdown",
-          "command": "playground-readme-editor.open",
-          "alt": "markdown.showPreviewToSide",
+          "command": "playground-readme-editor.openPreviewToSide",
           "group": "navigation"
         }
       ]
     },
     "commands": [
       {
-        "command": "playground-readme-editor.open",
-        "title": "Open block editor"
+        "command": "playground-readme-editor.openPreviewToSide",
+        "title": "Edit in Playground"
       }
     ],
     "viewsContainers": {
@@ -79,9 +78,11 @@
     "@typescript-eslint/parser": "^8.3.0",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
+    "@vscode/vsce": "^2.15.0",
+    "@wp-playground/blueprints": "1.1.2",
+    "@wp-playground/cli": "1.1.2",
     "eslint": "^9.9.1",
     "rimraf": "^6.0.1",
-    "typescript": "^5.5.4",
-    "@vscode/vsce": "^2.15.0"
+    "typescript": "^5.5.4"
   }
 }

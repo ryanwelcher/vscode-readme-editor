@@ -113,7 +113,7 @@ export default class PlaygroundWebViewProvider
    * Retrieves the markup content.
    * @returns string
    */
-  private _getLocalFile(fileName: string): string {
+  public getLocalFile(fileName: string): string {
     const filePath: vscode.Uri = vscode.Uri.file(
       path.join(this._extensionUri.path, 'assets', fileName)
     );
@@ -126,7 +126,7 @@ export default class PlaygroundWebViewProvider
    * @returns
    */
   private _getHtmlForWebview(content: string): string {
-    const contents = this._getLocalFile('webview.html')
+    const contents = this.getLocalFile('webview.html')
       // .replaceAll('${content}', content)
       .replaceAll(
         '${playgroundOptions}',
@@ -142,7 +142,7 @@ export default class PlaygroundWebViewProvider
    * @returns
    */
   private _getBlueprint(): string {
-    const BlueprintContents = this._getLocalFile('_playground/blueprint.json');
+    const BlueprintContents = this.getLocalFile('_playground/blueprint.json');
     return BlueprintContents;
   }
 
@@ -157,10 +157,10 @@ export default class PlaygroundWebViewProvider
     initialValue: string,
     initialFormat: string = 'markdown'
   ) {
-    let pluginIndexPhpContents = this._getLocalFile(
+    let pluginIndexPhpContents = this.getLocalFile(
       '_playground/playground-editor/index.php'
     );
-    let scriptPluginContent = this._getLocalFile(
+    let scriptPluginContent = this.getLocalFile(
       '_playground/playground-editor/script.js'
     );
 

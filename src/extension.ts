@@ -85,10 +85,7 @@ export function activate(context: vscode.ExtensionContext) {
           }
         );
 
-        // panel.webview.html = provider.getLocalFile('webview.html');
-
-        // Load playground
-        //
+        // Load playground.
         const cli = await runCLI({
           command: 'server',
           port: 8889,
@@ -98,13 +95,16 @@ export function activate(context: vscode.ExtensionContext) {
         const php = await handler.getPrimaryPhp();
 
         // Login to the admin page.
-        // await login(php, {
-        //   username: 'admin',
-        // });
+        await login(php, {
+          username: 'admin',
+        });
 
         const contents = provider
           .getLocalFile('webview.html')
-          .replaceAll('{$playgroundURL}', 'http://127.0.0.1:8889/');
+          .replaceAll(
+            '{$playgroundURL}',
+            'http://127.0.0.1:8889/wp-admin/post-new.php'
+          );
 
         panel.webview.html = contents;
 
